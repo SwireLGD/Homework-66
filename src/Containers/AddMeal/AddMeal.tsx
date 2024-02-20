@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axiosApi from "../../axiosApi";
 
 const AddMeal = () => {
     const [meal, setMeal] = useState( {time: '', description: '', calories: ''} );
     const params = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchMeal = async () => {
@@ -34,6 +35,7 @@ const AddMeal = () => {
             await axiosApi.put('/meals/' + params.id + '.json', meal);
           } else {
             await axiosApi.post('/meals.json', meal);
+            navigate('/');
           }
         } catch (error) {
           console.error("Failed to submit post", error);
@@ -80,7 +82,7 @@ const AddMeal = () => {
                         className="input-group-text w-100 mb-3"
                         id="calories"
                         name="calories"
-                        type="text"
+                        type="number"
                         value={meal.calories}
                         onChange={handleChange}
                         required
