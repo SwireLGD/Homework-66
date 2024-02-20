@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosApi from "../../axiosApi";
+import Loader from "../../Components/Loader/Loader";
 
 const AddMeal = () => {
     const [meal, setMeal] = useState( {time: '', description: '', calories: ''} );
     const params = useParams();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchMeal = async () => {
@@ -29,29 +31,30 @@ const AddMeal = () => {
 
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
     
         try {
-          if (params.id) {
-            await axiosApi.put('/meals/' + params.id + '.json', meal);
-          } else {
-            await axiosApi.post('/meals.json', meal);
-            navigate('/');
-          }
+            if (params.id) {
+                await axiosApi.put('/meals/' + params.id + '.json', meal);
+            } else {
+                await axiosApi.post('/meals.json', meal);
+                navigate('/');
+            }
         } catch (error) {
-          console.error("Failed to submit post", error);
+            console.error("Failed to submit post", error);
+        } finally {
+            setIsLoading(false);
         }
 
-    }, [params.id, meal]);
+    }, [params.id, meal, navigate]);
 
     return (
-        <div className="d-flex flex-column align-items-center text-center w-100 mt-5">
-            <h1>{params.id ? 'Edit Meal' : 'New Meal'}</h1>
+        <div className="d-flex flex-column align-items-start w-100 mt-4">
+            <h1 className="mb-4">{params.id ? 'Edit Meal' : 'New Meal'}</h1>
             <form onSubmit={handleSubmit} className="w-75">
                 <div>
-                    <label htmlFor="time" className="form-label">Time</label>
                     <select
-                        className="form-select w-100 mb-3"
-                        id="time"
+                        className="form-select w-75 mb-3"
                         name="time"
                         value={meal.time}
                         onChange={handleChange}
@@ -65,30 +68,31 @@ const AddMeal = () => {
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="description" className="form-label">Description</label>
                     <input
-                        className="input-group-text w-100 mb-3"
-                        id="description"
+                        className="input-group-text w-75 mb-3 text-start"
                         name="description"
                         type="text"
                         value={meal.description}
                         onChange={handleChange}
+                        placeholder="Meal description"
                         required
                     />
                 </div>
-                <div>
-                    <label htmlFor="calories" className="form-label">calories</label>
+                <div className="d-flex align-items-center">
                     <input
-                        className="input-group-text w-100 mb-3"
-                        id="calories"
+                        className="input-group-text w-25 text-start"
                         name="calories"
                         type="number"
                         value={meal.calories}
                         onChange={handleChange}
+                        placeholder="calories"
                         required
                     />
+                    <span className="ms-1">kcal</span>
                 </div>
-                <button type="submit" className="btn btn-primary">{params.id ? 'Edit' : 'Save'}</button>
+                <button type="submit" className="btn btn-primary mt-3" disabled={isLoading}>
+                    {isLoading ? <Loader /> : (params.id ? 'Edit' : 'Save')}
+                </button>
             </form>
         </div>
     );

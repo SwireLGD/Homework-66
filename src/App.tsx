@@ -11,16 +11,12 @@ function App() {
       <header>
         <Header />
       </header>
-      <main>
-        <button>
-        <NavLink to="/new-meal" className={({ isActive }) => isActive ? 'active' : undefined}>Add new meal</NavLink>
-        </button>
+      <main className="container-fluid">
         <Routes>
           <Route path="/" element={<Meals />} />
           <Route path="/new-meal" element={<AddMeal />} />
           <Route path="/meals/:id/edit" element={<AddMeal />} />
         </Routes>
-        <Meals />
       </main>
     </>
   );
